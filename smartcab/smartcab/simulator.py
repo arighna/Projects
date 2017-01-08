@@ -89,7 +89,7 @@ class Simulator(object):
         
         if self.log_metrics:
             a = self.env.primary_agent
-
+            print a.learning, self.optimized
             # Set log files
             if a.learning:
                 if self.optimized: # Whether the user is optimizing the parameters and decay functions
