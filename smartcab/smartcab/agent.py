@@ -73,7 +73,9 @@ class LearningAgent(Agent):
 #        self.epsilon = self.epsilon -0.00025*self.trialNumber
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-
+        if testing:
+            self.alpha=0
+            self.epsilon=0
         return None
 
     def build_state(self):
@@ -246,9 +248,9 @@ def run():
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
     agent = env.create_agent(LearningAgent)
-
-    agent.learning = True
-    agent.alpha = 0.6
+    print agent.Q
+#    agent.learning = True
+#    agent.alpha = 0.6
 
 
     
@@ -266,15 +268,15 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env,update_delay=0.01,log_metrics=True, optimized=True)
+    sim = Simulator(env,log_metrics=True, update_delay=0.01, optimized=False)
 
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=20,tolerance=0.15)
-
+    sim.run(n_test=10)#,tolerance=0.15)
+    print agent.Q
 
 if __name__ == '__main__':
     run()
