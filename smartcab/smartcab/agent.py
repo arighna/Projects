@@ -39,13 +39,13 @@ class LearningAgent(Agent):
         #self.Q_init = 0  #initial Q^ values for new state-actions not observed yet.
         self.Q_init = 13 #initial Q^ values for new state-actions not observed yet.
 
-        self.gamma = 0
-#        self.gamma = 0.1  #discounting rate of future rewards
+#        self.gamma = 0
+        self.gamma = 0.1  #discounting rate of future rewards
 
         """The output for the Logistic function for epsilon ranges from 0.75 to 0.99, and increases as the number of total
         steps increases during the learning process.  Random actions will give way to
         the 'best' action, gradually, but will never exceed 99%."""
-        self.alpha = 1
+
 #        self.alpha = 1 - ( 0.5 / (1 + math.exp(-0.05*(self.lesson_counter-100)))) #alpha ranges from 1 to 0.5
         self.possible_actions = ["forward","left","right","None"]
         
@@ -67,8 +67,8 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         # mychange
 #        self.epsilon = 1
-        self.epsilon = self.epsilon -0.04
-#        self.epsilon = 0.75 + (0.24 / (1+( math.exp(-0.1*(self.lesson_counter-40)))))        
+#        self.epsilon = self.epsilon -0.05
+        self.epsilon = 0.75 + (0.24 / (1+( math.exp(-0.1*(self.lesson_counter-40)))))        
 
 #        self.epsilon = self.epsilon -0.00025*self.trialNumber
         # Update additional class parameters as needed
@@ -121,7 +121,7 @@ class LearningAgent(Agent):
             maxQ = k[v.index(max(v))]
 
 
-        return maxQ 
+        return maxQ
 
 
     def createQ(self, state):
@@ -145,7 +145,7 @@ class LearningAgent(Agent):
                 
         
         return
-        
+
        
     def choose_action(self, state):
         """ The choose_action function is called when the agent is asked to choose
@@ -163,9 +163,8 @@ class LearningAgent(Agent):
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
         
-        
         if self.learning:
-            p = random.randrange(0,5)
+            p = random.uniform(0,1)
             if p< self.epsilon:
                 action = random.choice(self.possible_actions)
             else:
@@ -187,14 +186,13 @@ class LearningAgent(Agent):
         
         #next_state = (next_inputs['light'],next_inputs['oncoming'], next_waypoint)
         next_state = (next_waypoint,next_inputs['light'],next_inputs['oncoming'])
-
             
         ########### 
         ## TO DO ##
         ###########
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
-        if self.learn:
+        if self.learning:
             print("next state {}".format(self.Q[next_state]))
             _actions = self.Q[next_state]
             v = list(_actions.values())
@@ -202,18 +200,16 @@ class LearningAgent(Agent):
             maxFutureAction = k[v.index(max(v))]
             v1 = self.Q[next_state][maxFutureAction]
             print("learning from {} {} {}".format(state,action,v1))
-            gamma = 0;
+            gamma = 0.1;
             new_value = self.Q[state][action] + self.alpha*(reward +gamma*v1-self.Q[state][action])
             self.Q[state][action]=new_value
         return
-
 
 
     def update(self):
         """ The update function is called when a time step is completed in the 
             environment for a given trial. This function will build the agent
             state, choose an action, receive a reward, and learn if enabled. """
-
 
         state = self.build_state()          # Get current state
         
@@ -248,8 +244,8 @@ def run():
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
     agent = env.create_agent(LearningAgent)
-    print agent.Q
-#    agent.learning = True
+#    print agent.Q
+    agent.learning = True
 #    agent.alpha = 0.6
 
 
@@ -260,7 +256,7 @@ def run():
     #   enforce_deadline - set to True to enforce a deadline metric
     env.set_primary_agent(agent)
     env.enforce_deadline = True
-
+    
     ##############
     # Create the simulation
     # Flags:
@@ -268,15 +264,15 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env,log_metrics=True, update_delay=0.01, optimized=False)
+    sim = Simulator(env,log_metrics=True, update_delay=0.01, optimized=True)
 
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10)#,tolerance=0.15)
-    print agent.Q
+    sim.run(n_test=20,tolerance=0.15)
+
 
 if __name__ == '__main__':
     run()
