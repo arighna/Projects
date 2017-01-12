@@ -67,10 +67,10 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         # mychange
 #        self.epsilon = 1
-        self.epsilon = self.epsilon -0.05
+#        self.epsilon = self.epsilon -0.05
 #        self.epsilon = 0.75 + (0.24 / (1+( math.exp(-0.1*(self.lesson_counter-40)))))        
 #        self.epsilon = 1 - (1/(1+math.exp(-0.1*self.alpha*(self.trialNumber-40))))
-#        self.epsilon = self.epsilon -0.00025*self.trialNumber
+        self.epsilon = self.epsilon -0.00025*self.trialNumber
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
         if testing:
@@ -110,19 +110,18 @@ class LearningAgent(Agent):
         ###########
         # Calculate the maximum Q-value of all actions for a given state
 
-        maxQ = random.choice(self.possible_actions)
+        max_v = None
         
         if state in self.Q:
             _actions = self.Q[state]
             #index = actions.index(max(actions))
             #print("Q for current states = {} max = {}".format(_actions,max(_actions)))
             v = list(_actions.values())
-            k = list(_actions.keys())
-            maxQ = k[v.index(max(v))]
+            max_v = max(v)
 
 
-#        return max(v)
-        return maxQ
+        return max_v
+#        return maxQ
 
 
     def createQ(self, state):
@@ -169,14 +168,15 @@ class LearningAgent(Agent):
             if p< self.epsilon:
                 action = random.choice(self.possible_actions)
             else:
-#                max_v=self.get_maxQ(state)
-#                actions=self.Q[state].keys()
-#                max_actions=[action for action in actions if self.Q[state][action]==max_v]
-#                action = random.choice(max_actions)
-                action=self.get_maxQ(state)
+                max_v=self.get_maxQ(state)
+                if max_v:
+                    actions=self.Q[state].keys()
+                    max_actions=[action for action in actions if self.Q[state][action]==max_v]
+                    action = random.choice(max_actions)
+                else:
+                    action = random.choice(self.possible_actions)
         else:
             action = random.choice(self.possible_actions)
-        
         return action
 
 
@@ -249,12 +249,8 @@ def run():
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
     agent = env.create_agent(LearningAgent)
-#    print agent.Q
     agent.learning = True
-    agent.alpha=0.4
-
-
-
+    agent.alpha=0.6
     
     ##############
     # Follow the driving agent
@@ -270,14 +266,14 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env,log_metrics=True, update_delay=0.01)#, optimized=True)
+    sim = Simulator(env,log_metrics=True, update_delay=0.01, optimized=True)
 
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10,tolerance=0.15)
+    sim.run(n_test=20,tolerance=0.15)
 #    print agent.Q
 
 if __name__ == '__main__':
